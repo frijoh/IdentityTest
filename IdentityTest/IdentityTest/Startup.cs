@@ -72,6 +72,8 @@ namespace IdentityTest
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            DocumentDBConfig.Configure();
         }
     }
 }
