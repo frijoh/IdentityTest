@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/config
+/.vs/IdentityTest/v15
+/IdentityTest/.vs/IdentityTest/v15/Server/sqlite3
+/IdentityTest/IdentityTest/bin/Debug/netcoreapp2.2
+/IdentityTest/IdentityTest/Migrations
+/IdentityTest/IdentityTest/obj
