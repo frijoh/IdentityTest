@@ -1,4 +1,5 @@
-﻿using IdentityTest.Models;
+﻿using IdentityTest.Data;
+using IdentityTest.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -22,6 +23,8 @@ namespace IdentityTest
             {
                 try
                 {
+                    DocumentDBConfig.Configure();
+
                     var services = scope.ServiceProvider;
                     var serviceProvider = services.GetRequiredService<IServiceProvider>();
                     var configuration = services.GetRequiredService<IConfiguration>();
@@ -55,32 +58,76 @@ namespace IdentityTest
                 var roleExist = await RoleManager.RoleExistsAsync(roleName);
                 if (!roleExist)
                 {
-                    roleResult = await RoleManager.CreateAsync(new IdentityRole(roleName));
+                    var identityRole = new IdentityRole(roleName);
+                    roleResult = await RoleManager.CreateAsync(identityRole);
                 }
             }
         }
 
         private static async Task CreateAdminAccount(IServiceProvider serviceProvider, IConfiguration configuration)
         {
-            var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var administrator = new ApplicationUser
+            var useEf = false;
+
+            if (!useEf)
             {
-                UserName = configuration.GetSection("UserSettings")["UserEmail"],
-                Email = configuration.GetSection("UserSettings")["UserEmail"]
-            };
-            
-            var userPassword = configuration.GetSection("UserSettings")["UserPassword"];
-            var user = await UserManager.FindByEmailAsync(administrator.Email);
-            
-            if (user == null)
-            {
-                var createPowerUser = await UserManager.CreateAsync(administrator, userPassword);
-                if (createPowerUser.Succeeded)
+                var UserManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var administrator = new IdentityUser
                 {
-                    // here we assign the new user the "Admin" role 
-                    await UserManager.AddToRoleAsync(administrator, "Admin");
+                    UserName = configuration.GetSection("UserSettings")["UserEmail"],
+                    Email = configuration.GetSection("UserSettings")["UserEmail"]
+                };
+
+                var userPassword = configuration.GetSection("UserSettings")["UserPassword"];
+                var user = await UserManager.FindByEmailAsync(administrator.Email);
+
+                if (user == null)
+                {
+                    var createPowerUser = await UserManager.CreateAsync(administrator, userPassword);
+                    if (createPowerUser.Succeeded)
+                    {
+                        // here we assign the new user the "Admin" role 
+                        await UserManager.AddToRoleAsync(administrator, "Admin");
+                    }
                 }
             }
+            else
+            {
+                var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                var administrator = new ApplicationUser
+                {
+                    UserName = configuration.GetSection("UserSettings")["UserEmail"],
+                    Email = configuration.GetSection("UserSettings")["UserEmail"]
+                };
+
+                var userPassword = configuration.GetSection("UserSettings")["UserPassword"];
+                var user = await UserManager.FindByEmailAsync(administrator.Email);
+
+                if (user == null)
+                {
+                    var createPowerUser = await UserManager.CreateAsync(administrator, userPassword);
+                    if (createPowerUser.Succeeded)
+                    {
+                        // here we assign the new user the "Admin" role 
+                        await UserManager.AddToRoleAsync(administrator, "Admin");
+                    }
+                }
+            }
+
+
+
+
+            //var userPassword = configuration.GetSection("UserSettings")["UserPassword"];
+            //var user = await UserManager.FindByEmailAsync(administrator.Email);
+            
+            //if (user == null)
+            //{
+            //    var createPowerUser = await UserManager.CreateAsync(administrator, userPassword);
+            //    if (createPowerUser.Succeeded)
+            //    {
+            //        // here we assign the new user the "Admin" role 
+            //        await UserManager.AddToRoleAsync(administrator, "Admin");
+            //    }
+            //}
         }
     }
 }

@@ -30,12 +30,24 @@ namespace IdentityTest
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<ApplicationDbContext>(
+            var useEf = false;
+
+            if (!useEf)
+            {
+                services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders();
+
+                services.AddTransient<IUserStore<IdentityUser>, CosmosDbUserStore>();
+                services.AddTransient<IRoleStore<IdentityRole>, CosmosDbRoleStore>();
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(
                 options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+                services.AddIdentity<ApplicationUser, IdentityRole>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddDefaultTokenProviders();
+            }
 
             services.AddAuthorization(options =>
             {
@@ -73,7 +85,7 @@ namespace IdentityTest
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            DocumentDBConfig.Configure();
+            //DocumentDBConfig.Configure();
         }
     }
 }
