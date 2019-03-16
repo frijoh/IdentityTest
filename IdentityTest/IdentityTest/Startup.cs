@@ -29,10 +29,9 @@ namespace IdentityTest
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            var useEf = Configuration.GetSection("EntityFrameWork")["Enabled"];
 
-            var useEf = false;
-
-            if (!useEf)
+            if (useEf == "false")
             {
                 services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders();
 

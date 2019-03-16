@@ -66,9 +66,9 @@ namespace IdentityTest
 
         private static async Task CreateAdminAccount(IServiceProvider serviceProvider, IConfiguration configuration)
         {
-            var useEf = false;
+            var useEf = configuration.GetSection("EntityFrameWork")["Enabled"];
 
-            if (!useEf)
+            if (useEf == "false")
             {
                 var UserManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
                 var administrator = new IdentityUser
