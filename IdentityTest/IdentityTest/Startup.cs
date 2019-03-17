@@ -33,9 +33,9 @@ namespace IdentityTest
 
             if (useEf == "false")
             {
-                services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders();
+                services.AddIdentity<ExtendedIdentityUser, IdentityRole>().AddDefaultTokenProviders();
 
-                services.AddTransient<IUserStore<IdentityUser>, CosmosDbUserStore>();
+                services.AddTransient<IUserStore<ExtendedIdentityUser>, CosmosDbUserStore>();
                 services.AddTransient<IRoleStore<IdentityRole>, CosmosDbRoleStore>();
             }
             else

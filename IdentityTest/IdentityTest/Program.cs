@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IdentityTest
@@ -23,8 +24,9 @@ namespace IdentityTest
             {
                 try
                 {
-                    DocumentDBConfig.Configure();
 
+                    DocumentDBConfig.Configure();
+                    Thread.Sleep(5000);
                     var services = scope.ServiceProvider;
                     var serviceProvider = services.GetRequiredService<IServiceProvider>();
                     var configuration = services.GetRequiredService<IConfiguration>();
@@ -70,8 +72,8 @@ namespace IdentityTest
 
             if (useEf == "false")
             {
-                var UserManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
-                var administrator = new IdentityUser
+                var UserManager = serviceProvider.GetRequiredService<UserManager<ExtendedIdentityUser>>();
+                var administrator = new ExtendedIdentityUser
                 {
                     UserName = configuration.GetSection("UserSettings")["UserEmail"],
                     Email = configuration.GetSection("UserSettings")["UserEmail"]

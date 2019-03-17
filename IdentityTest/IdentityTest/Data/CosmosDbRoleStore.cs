@@ -42,7 +42,7 @@ namespace IdentityTest.Data
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public Task<IdentityRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)

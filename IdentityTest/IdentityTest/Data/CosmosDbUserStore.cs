@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using IdentityTest.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Azure.Documents.Client;
 using System;
 using System.Collections.Generic;
@@ -8,23 +9,29 @@ using System.Threading.Tasks;
 
 namespace IdentityTest.Data
 {
-    public class CosmosDbUserStore :
-        IUserStore<IdentityUser>,
-        IUserEmailStore<IdentityUser>,
-        IUserPasswordStore<IdentityUser>,
-        IUserRoleStore<IdentityUser>
+    public class CosmosDbUserStore:
+        IUserStore<ExtendedIdentityUser>,
+        IUserEmailStore<ExtendedIdentityUser>,
+        IUserPasswordStore<ExtendedIdentityUser>,
+        IUserRoleStore<ExtendedIdentityUser>
     {
         private string EndpointUrl = "https://localhost:8081";
         private string AuthorizationKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
         private string DatabaseId = "IdentityTest";
         private string UserCollectionId = "IdentityUser";
 
-        public Task AddToRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
+        public Task AddToRoleAsync(ExtendedIdentityUser user, string roleName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.Run(() => {
+                if(user.Roles == null)
+                {
+                    user.Roles = new List<string>();
+                }
+                user.Roles.Add(roleName);
+            }, cancellationToken);
         }
 
-        public Task<IdentityResult> CreateAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<IdentityResult> CreateAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
             return Task.Run(() =>
@@ -45,22 +52,22 @@ namespace IdentityTest.Data
             }, cancellationToken);
         }
 
-        public Task<IdentityResult> DeleteAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<IdentityResult> DeleteAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
-        public Task<IdentityUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        public Task<ExtendedIdentityUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
             var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
             return Task.Run(() =>
             {
-                return client.CreateDocumentQuery<IdentityUser>(
+                return client.CreateDocumentQuery<ExtendedIdentityUser>(
                  UriFactory.CreateDocumentCollectionUri(DatabaseId, UserCollectionId))
                  .Where(identityuser => identityuser.NormalizedEmail == normalizedEmail)
                  .AsEnumerable()
@@ -68,17 +75,25 @@ namespace IdentityTest.Data
             }, cancellationToken);
         }
 
-        public Task<IdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IdentityUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public Task<ExtendedIdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
             return Task.Run(() =>
             {
-                return client.CreateDocumentQuery<IdentityUser>(
+                return client.CreateDocumentQuery<ExtendedIdentityUser>(
+                 UriFactory.CreateDocumentCollectionUri(DatabaseId, UserCollectionId))
+                 .Where(identityuser => identityuser.Id == userId)
+                 .AsEnumerable()
+                 .FirstOrDefault();
+            }, cancellationToken);
+        }
+
+        public Task<ExtendedIdentityUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        {
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            return Task.Run(() =>
+            {
+                return client.CreateDocumentQuery<ExtendedIdentityUser>(
                  UriFactory.CreateDocumentCollectionUri(DatabaseId, UserCollectionId))
                  .Where(identityuser => identityuser.NormalizedUserName == normalizedUserName)
                  .AsEnumerable()
@@ -86,7 +101,7 @@ namespace IdentityTest.Data
             }, cancellationToken);
         }
 
-        public Task<string> GetEmailAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<string> GetEmailAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
@@ -94,37 +109,42 @@ namespace IdentityTest.Data
             }, cancellationToken);
         }
 
-        public Task<bool> GetEmailConfirmedAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<bool> GetEmailConfirmedAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> GetNormalizedEmailAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<string> GetNormalizedEmailAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> GetNormalizedUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<string> GetNormalizedUserNameAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> GetPasswordHashAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<string> GetPasswordHashAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IList<string>> GetRolesAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<IList<string>> GetRolesAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.Run(() => {
+                return user.Roles;
+            }, cancellationToken);
         }
 
-        public Task<string> GetUserIdAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<string> GetUserIdAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.Run(() =>
+            {
+                return user.Id;
+            }, cancellationToken);
         }
 
-        public Task<string> GetUserNameAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<string> GetUserNameAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
@@ -132,37 +152,40 @@ namespace IdentityTest.Data
             }, cancellationToken);
         }
 
-        public Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        public Task<IList<ExtendedIdentityUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> HasPasswordAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<bool> HasPasswordAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsInRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
+        public Task<bool> IsInRoleAsync(ExtendedIdentityUser user, string roleName, CancellationToken cancellationToken)
+        {
+            return Task.Run(() =>
+            {
+                return user.Roles == null ? false : user.Roles.Contains(roleName);
+            }, cancellationToken);
+        }
+
+        public Task RemoveFromRoleAsync(ExtendedIdentityUser user, string roleName, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveFromRoleAsync(IdentityUser user, string roleName, CancellationToken cancellationToken)
+        public Task SetEmailAsync(ExtendedIdentityUser user, string email, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task SetEmailAsync(IdentityUser user, string email, CancellationToken cancellationToken)
+        public Task SetEmailConfirmedAsync(ExtendedIdentityUser user, bool confirmed, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task SetEmailConfirmedAsync(IdentityUser user, bool confirmed, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SetNormalizedEmailAsync(IdentityUser user, string normalizedEmail, CancellationToken cancellationToken)
+        public Task SetNormalizedEmailAsync(ExtendedIdentityUser user, string normalizedEmail, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
@@ -170,7 +193,7 @@ namespace IdentityTest.Data
             }, cancellationToken);
         }
 
-        public Task SetNormalizedUserNameAsync(IdentityUser user, string normalizedName, CancellationToken cancellationToken)
+        public Task SetNormalizedUserNameAsync(ExtendedIdentityUser user, string normalizedName, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
@@ -178,7 +201,7 @@ namespace IdentityTest.Data
             }, cancellationToken);
         }
 
-        public Task SetPasswordHashAsync(IdentityUser user, string passwordHash, CancellationToken cancellationToken)
+        public Task SetPasswordHashAsync(ExtendedIdentityUser user, string passwordHash, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
@@ -186,12 +209,12 @@ namespace IdentityTest.Data
             }, cancellationToken);
         }
 
-        public Task SetUserNameAsync(IdentityUser user, string userName, CancellationToken cancellationToken)
+        public Task SetUserNameAsync(ExtendedIdentityUser user, string userName, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IdentityResult> UpdateAsync(IdentityUser user, CancellationToken cancellationToken)
+        public Task<IdentityResult> UpdateAsync(ExtendedIdentityUser user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
