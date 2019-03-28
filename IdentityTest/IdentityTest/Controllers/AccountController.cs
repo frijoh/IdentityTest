@@ -10,12 +10,16 @@ namespace IdentityTest.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
+        //private readonly UserManager<ApplicationUser> userManager;
+        //private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly UserManager<ExtendedIdentityUser> userManager;
+        private readonly SignInManager<ExtendedIdentityUser> signInManager;
 
         public AccountController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager
+             //UserManager<ApplicationUser> userManager,
+             //SignInManager<ApplicationUser> signInManager
+             UserManager<ExtendedIdentityUser> userManager,
+            SignInManager<ExtendedIdentityUser> signInManager
             )
         {
             this.userManager = userManager;
@@ -86,7 +90,8 @@ namespace IdentityTest.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ExtendedIdentityUser { UserName = model.Email, Email = model.Email };
+                //var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

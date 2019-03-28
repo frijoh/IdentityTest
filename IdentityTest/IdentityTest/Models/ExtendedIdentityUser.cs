@@ -8,7 +8,7 @@ namespace IdentityTest.Models
     public class ExtendedIdentityUser : IdentityUser
     {
         [JsonProperty(PropertyName = "id")]
-        public string id { get; set; }
+        public string DocumentId { get; set; }
 
         public IList<string> Roles { get; set; }
 

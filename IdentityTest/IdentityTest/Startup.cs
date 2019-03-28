@@ -50,8 +50,8 @@ namespace IdentityTest
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("Administrator", policy => policy.RequireRole("Admin"));
-                options.AddPolicy("Member", policy => policy.RequireRole("Member"));
+                options.AddPolicy("Administrator", policy => policy.RequireRole("ADMIN"));
+                options.AddPolicy("Member", policy => policy.RequireRole("MEMBER"));
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
